@@ -1,10 +1,8 @@
 #include "MatrixOps.h"
 #include <lua.h>
+#include <lauxlib.h>
 
-#include <f17/common.h>
-#include <f17/lua.h>
-
-unit void check_float_tab(lua_State* L, int arg, int count, float* target) {
+static void check_float_tab(lua_State* L, int arg, int count, float* target) {
 	char buf[0x80];
 
 	luaL_checktype(L, arg, LUA_TTABLE);
@@ -24,7 +22,7 @@ unit void check_float_tab(lua_State* L, int arg, int count, float* target) {
 	}
 }
 
-unit void floats_to_lua(lua_State* L, const float* source, int count) {
+static void floats_to_lua(lua_State* L, const float* source, int count) {
 	lua_createtable(L, count, 0);
 	for(int i = 1; i <= count; i++) {
 		lua_pushnumber(L, (lua_Number) *source);
@@ -33,7 +31,7 @@ unit void floats_to_lua(lua_State* L, const float* source, int count) {
 	}
 }
 
-unit lua_callable int decompose_wrapper(lua_State* L) {
+static int decompose_wrapper(lua_State* L) {
 
 	float matrix[16];
 	float translate[3];
@@ -50,7 +48,7 @@ unit lua_callable int decompose_wrapper(lua_State* L) {
 	return 3;
 }
 
-unit lua_callable int recompose_wrapper(lua_State* L) {
+static int recompose_wrapper(lua_State* L) {
 	float translate[3];
 	float rotate[3];
 	float scale[3];

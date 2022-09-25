@@ -1,7 +1,6 @@
 CFLAGS ::= \
 	-Wall \
-	-Wpedantic \
-	-isystem /usr/local/musl/include
+	-Wpedantic
 
 ifeq ($(SHOW_STRUCT_PADDING), y)
 	CFLAGS += -Wno-padded
@@ -12,8 +11,13 @@ override CXXFLAGS += -Iinclude -std=c++11 -fPIC
 
 OBJS ::= obj/MatrixOps.o obj/module.o
 
-include c.mak
-include cpp.mak
+obj/%.o: src/%.c
+	@mkdir -p $(@D)
+	$(CC) -c -o $@ $< $(CFLAGS) $(COFLAGS)
+
+obj/%.o: src/%.cpp include/%.h
+	@mkdir -p $(@D)
+	$(CXX) -c -o $@ $< $(CXXFLAGS) $(CXXOFLAGS)
 
 .PHONY: clean
 .DEFAULT_GOAL: objs
@@ -24,6 +28,6 @@ clean:
 	rm -f obj/*.o
 
 gizmo_matrix.so: $(OBJS)
-	$(call recipe_link, -shared)
+	$(CC) -o $@ $^ $(CFLAGS) $(CLFLAGS) -shared
 
 all: gizmo_matrix.so
